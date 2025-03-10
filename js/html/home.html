@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <header>
+        <div class="menu">
+            <h2><a href="../html/home.html">Suite Store</a></h2>
+            <li><a href="../html/products.html">Products</a></li>
+            <li><a href="../html/categories.html">Categories</a></li>
+            <li><a href="../html/history.html">History</a></li>
+        </div>
+    </header>
+    <main>
+        <div id="informations">
+            <div class="first">
+                <select name="product" id="productName"></select>
+            </div>
+            <div class="others">
+                <input type="number" placeholder="Amount" id="amount">
+                <input type="number" placeholder="Tax" id="tax" disabled>
+                <input type="number" placeholder="Price" id="price" disabled>
+            </div>
+            <button class="add-product" id="add-item">Add product</button>
+        </div>
+        <div>
+            <table id="table">
+                <tr>
+                    <th>Product</th>
+                    <th>Unit price</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Total</th>
+                    <th class="last-elem">Action</th>
+                </tr>
+                <tr>
+                    <td>Rice</td>
+                    <td>$2.00</td>
+                    <td>2</td>
+                    <td>4.00</td>
+                    <td class="last-elem"><button class="remove-product" id="remove-product">Delete</button></td>
+                </tr>
+                <tr>
+                    <td>Corn</td>
+                    <td>$6.00</td>
+                    <td>3</td>
+                    <td>18.00</td>
+                    <td class="last-elem"><button class="remove-product" id="remove-product">Delete</button></td>
+                </tr>
+                <tr class="last-tr">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+        <footer>
+            <div id="tax-price">
+                <p>Tax:</p>
+                <p>$6.30</p>
+            </div>
+            <div id="total">
+                <p>Total:</p>
+                <p>$32.50</p>
+            </div>
+            <div id="final">
+                <button id="cancel" class="cancel">Cancel</button>
+                <button id="finish" class="end">Finish</button>
+            </div>
+        </footer>
+    </main>
+</body>
+
+</html>
+
+<script src="../script/home.js"></script>

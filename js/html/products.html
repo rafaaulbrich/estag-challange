@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <div class="menu">
+            <h2><a href="../html/home.html">Suite Store</a></h2>
+            <li><a href="../html/products.html">Products</a></li>
+            <li><a href="../html/categories.html">Categories</a></li>
+            <li><a href="../html/history.html">History</a></li>
+        </div>
+    </header>
+    <main>
+    <div id="informations">
+        <div class="first-prod">
+            <input type="text" placeholder="Product name" id="productName" maxlength="30">
+        </div>
+        <div class="others">
+            <input type="number" placeholder="Amount" id="amount">
+            <input type="number" placeholder="Unit price ($)" id="unitPrice">
+            <select name="category" id="category">
+                <option value="" selected hidden>Select category</option>
+            </select>
+        </div>
+        <button class="add-product" id="add-product">Add product</button>
+    </div>
+    <div>
+        <table id="table">
+            <tr>
+                <th>Code</th>
+                <th>Product</th>
+                <th>Amount</th>
+                <th>Unit price</th>
+                <th>Category</th>
+            </tr>
+        </table>
+    </div>
+</main>
+</body>
+</html>
+
+<script src="../script/product.js"></script>

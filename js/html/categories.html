@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <div class="menu">
+            <h2><a href="../html/home.html">Suite Store</a></h2>
+            <li><a href="../html/products.html">Products</a></li>
+            <li><a href="../html/categories.html">Categories</a></li>
+            <li><a href="../html/history.html">History</a></li>
+        </div>
+    </header>
+    <main>
+        <div id="informations">
+            <div class="others2">
+                <input type="text" placeholder="Category name" id="categoryName" maxlength="30">
+                <input type="number" placeholder="Tax (%)" id="tax">
+            </div>
+            <button class="add-category" id="add-category">Add category</button>
+        </div>
+        <div>
+            <table id="table">
+                <tr>
+                    <th>Code</th>
+                    <th>Category</th>
+                    <th>Tax</th>
+                </tr>
+                <tr>
+                    <td>001</td>
+                    <td>Food</td>
+                    <td>10%</td>
+                    <td><button class="btn-table" id="remove-category">Delete</button></td>
+                </tr>
+            </table>
+        </div>
+    </main>
+</body>
+</html>
+
+<script src="../script/category.js"></script>

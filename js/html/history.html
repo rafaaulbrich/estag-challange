@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <header>
+        <div class="menu">
+            <h2><a href="../html/home.html">Suite Store</a></h2>
+            <li><a href="../html/products.html">Products</a></li>
+            <li><a href="../html/categories.html">Categories</a></li>
+            <li><a href="../html/history.html">History</a></li>
+        </div>
+    </header>
+    <div>
+        <table id="table">
+            <tr>
+                <th>Code</th>
+                <th>Tax</th>
+                <th>Total</th>
+                <th class="last-elem">Action</th>
+            </tr>
+            <tr>
+                <td>001</td>
+                <td>$2.00</td>
+                <td>$20.00</td>
+                <td class="last-elem"><button id="btn-history-modal">View</button></td>
+            </tr>
+            <tr>
+                <td>002</td>
+                <td>$0.50</td>
+                <td>$10.00</td>
+                <td class="button-history">
+                <button id="btnModal" class="finish">View</button>
+            </tr>
+                <div id="modal-container" class="modal-container">
+                    <div class="modal" id="purchaseDetails">
+                        <button class="close" id="close" onclick="closeModal()">X</button>
+                    </div>
+                </div>
+            </td>
+        </table>
+    </div>
+</body>
+
+</html>
+
+<script src="../script/history.js"></script>
