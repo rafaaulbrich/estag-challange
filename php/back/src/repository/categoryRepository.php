@@ -15,7 +15,12 @@ class CategoryRepository {
 
     public function getCategories($name) {
         $stmt = $this->db->getConnection()->prepare("SELECT name FROM CATEGORIES WHERE name = :name");
-        $stmt->execute();
+        $stmt->execute(['name' => $name]);
+    }
+
+    public function getCategoryById($id) {
+        $stmt = $this->db->getConnection()->prepare("SELECT id FROM CATEGORIES WHERE id = :id");
+        $stmt->execute(['id' => $id]);
     }
 
     public function getAllCategories() {
@@ -23,16 +28,15 @@ class CategoryRepository {
         return $stmt->fetchAll();
     }
 
-    public function createCategory($category) {
+    public function createCategory($data) {
         $stmt = $this->db->getConnection()->prepare("INSERT INTO CATEGORIES (name, tax) VALUES (:name, :tax)");
-        $stmt->execute(["name" => $category["name"], "tax" => $category["tax"]]);
+        $stmt->execute(["name" => $data["name"], "tax" => $data["tax"]]);
     }
 
     public function deleteCategory($id) {
-        $stmt = $this->db->getConnection()->prepare("DELETE FROM CATEGORIES WHERE id = :id");
-        $stmt->execute();
+        $stmt = $this->db->getConnection()->prepare("DELETE FROM CATEGORIES WHERE code = :id");
+        $stmt->execute(['id' => $id]);
     }
-
 }
 
 ?>

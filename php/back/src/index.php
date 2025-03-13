@@ -8,6 +8,9 @@ require_once("./router/router.php");
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 handleRequest($uri, $routes);
 
+$json = file_get_contents('php://input');
+$data = json_encode($json, true);
+
 // error_log('Sou um log');
 // echo "Olá mundo";
 

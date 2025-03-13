@@ -9,15 +9,18 @@ class Database {
     private $pw = "root";
 
     public function __construct() {
-        $this->pdo = new PDO("pgsql:host=$this->host;dbname=$this->db", $this->user, $this->pw);
+        try {
+            $this->pdo = new PDO("pgsql:host=$this->host;dbname=$this->db", $this->user, $this->pw);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("Connection failed: " . $e->getMessage());
+        }
     }
 
     public function getConnection() {
         return $this->pdo;
     }
     
-    // $myPDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
 }
 
 ?>
