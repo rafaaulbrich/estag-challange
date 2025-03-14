@@ -14,46 +14,86 @@ let products = [];
 let categories = [];
 let purchase = [];
 
-function getCategories() {
-    if (localStorage.getItem("categories")) {
-        categories = JSON.parse(localStorage.getItem("categories"))
-    } else {
-        categories = []
+const getCategories = async () => {
+    try {
+        const response = await fetch('http://localhost/categories', {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        categories = await response.json(categories);
+
+    } catch (e) {
+        console.error("Erro ao buscar categorias:", e);
     }
 }
 
-function getProducts() {
-    if (localStorage.getItem("products")) {
-        products = JSON.parse(localStorage.getItem("products"))
-    } else {
-        products = []
+const getProducts = async () => {
+    try {
+        const response = await fetch('http://localhost/products', {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        products = await response.json(products);
+
+    } catch (e) {
+        console.error("Erro ao buscar categorias:", e);
     }
 }
 
 function populateProducts() {
+    let selectedValue = productSelect.value;
     products.forEach((p) => {
         if (p.amount > 0) {
-            productSelect.innerHTML += `<option value="${p.name}" id="product">${p.name}</option>`;
+            productSelect.innerHTML += `<option value="${p.code}" id="product">${p.name}</option>`;
         }
+        productSelect.value = selectedValue;
     })
 }
 
-function getItem() {
-    if (localStorage.getItem("items")) {
-        cartItems = JSON.parse(localStorage.getItem("items"))
-    } else {
-        cartItems = []
-    }
+
+const getOrderItem = async () => {
+    const response = await fetch('http://localhost/orders', {
+        method: 'GET'
+    })
+
+    cartItems = await response.json(cartItems);
 }
 
-function getDetails() {
-    if (!productSelect.value) {
-        return
+const getItemDetails = async () => {
+    await getOrderItem()
+    let product = products.find((p) => p.code == productSelect.value);
+    let category = categories.find((c) => c.code == product?.category_code);
+    try {
+        const response = await fetch('http://localhost/products', {
+            method: "GET"
+        })
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        products = await response.json(product);
+    } catch (e) {
+        console.error("Erro ao adicionar produto:", e);
     }
-    const product = products[products.findIndex((p) => p.name == productSelect.value)];
-    const productTax = categories[categories.findIndex((c) => c.name == product.category)].tax;
-    tax.value = `${productTax}`;
-    price.value = `${product.unitPrice}`;
+
+    try {
+        const response = await fetch('http://localhost/categories', {
+            method: "GET"
+        })
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        categories = await response.json(category);
+    } catch (e) {
+        console.error("Erro ao adicionar produto:", e);
+    }
+    tax.value = `${category?.tax}`;
+    price.value = `${product?.price}`;
 }
 
 function showCartItems() {
@@ -74,7 +114,6 @@ function showCartItems() {
     </table>
     `;
 
-    let i = 0
     for (let item of cartItems) {
         table.innerHTML += `
         <table>
@@ -83,11 +122,10 @@ function showCartItems() {
                 <td>$${Number(item.price).toFixed(2)}</td>
                 <td>${Number(item.amount)} units</td>
                 <td>$${Number(item.total).toFixed(2)}</td>
-                <td class="last-elem"><button id="btn-table" onclick="deleteItem(${i})">Delete</button></td>
+                <td class="last-elem"><button id="btn-table" onclick="deleteItem(${item.code})">Delete</button></td>
             </tr >
         </table >
         `;
-        i++
     }
 }
 
@@ -99,27 +137,33 @@ function validInputs() {
 }
 
 function validAmount() {
-    if(amount.value <= 0) {
+    if (amount.value <= 0) {
         return false
     }
     return true
 }
 
 function validAmountInteger() {
-    if(amount.value % 1 === 0) {
+    if (amount.value % 1 === 0) {
         return amount.value
     }
 }
 
-function deleteItem(index) {
-    cartItems = cartItems.filter((_, i) => i !== index);
+async function deleteItem(id) {
+    async function callApi(id) {
+        await fetch('http://localhost/orders/' + id, {
+            method: 'DELETE'
+        })
+    }
+    // cartItems = cartItems.filter((_, i) => i !== index);
 
-    localStorage.setItem("items", JSON.stringify(cartItems))
+    // localStorage.setItem("items", JSON.stringify(cartItems))
 
-    getItem()
-    getDetails()
-    showCartItems()
-    showTotal()
+    await callApi(id);
+    await getOrderItem();
+    await getItemDetails();
+    showCartItems();
+    showTotal();
 }
 
 function clearInputs() {
@@ -129,21 +173,21 @@ function clearInputs() {
     price.value = ""
 }
 
-function clearTable() {
-    if(cartItems.length === 0) {
+async function clearTable() {
+    if (cartItems.length === 0) {
         return alert("Your cart is empty!")
     } else {
         alert("Are you sure?")
         localStorage.setItem("items", JSON.stringify([]))
     }
 
-    getItem()
+    await getOrderItem()
     showCartItems();
     showTotal();
 }
 
 function validAmountProduct() {
-    let amountStock = products[products.findIndex((p) => p.name == productSelect.value)].amount;
+    let amountStock = products[products.findIndex((p) => p.code == productSelect.value)].amount;
     let findProduct = cartItems.findIndex((p) => p.name == productSelect.value);
     let amountCart = 0;
 
@@ -168,8 +212,8 @@ function showTotal() {
         fullTax = Number(fullTax) + ((Number(item.tax) / 100) * Number(item.price) * Number(item.amount))
     }
 
-    taxPrice.innerHTML = `Tax: $${ fullTax.toFixed(2) } `;
-    total.innerHTML = `Total: $${ Number(cartTotal + fullTax).toFixed(2) } `;
+    taxPrice.innerHTML = `Tax: $${fullTax.toFixed(2)} `;
+    total.innerHTML = `Total: $${Number(cartTotal + fullTax).toFixed(2)} `;
 }
 
 function finishPurchase() {
@@ -178,7 +222,7 @@ function finishPurchase() {
     }
     let history = JSON.parse(localStorage.getItem("history")) || [];
     let purchase = {
-        code: history.length > 0 ? history[history.length -1].code + 1 : 1,
+        code: history.length > 0 ? history[history.length - 1].code + 1 : 1,
         tax: Number(fullTax).toFixed(2),
         total: (Number(fullTax) + Number(cartTotal)).toFixed(2),
         products: [...cartItems]
@@ -191,22 +235,23 @@ function finishPurchase() {
     cartItems.forEach((item) => {
         let productIndex = products.findIndex((p) => p.name == item.name);
 
-        if(products[productIndex].amount !== -1) {
+        if (products[productIndex].amount !== -1) {
             products[productIndex].amount -= item.amount;
 
-            if(products[productIndex].amount < 0) {
+            if (products[productIndex].amount < 0) {
                 products[productIndex].amount = 0
             }
         }
     }
-)
+    )
     localStorage.setItem("products", JSON.stringify(products))
     localStorage.setItem("items", JSON.stringify([]));
 
     window.location.href = './history.html'
 }
 
-function addItem() {
+const createItem = async () => {
+
     if (!validInputs()) {
         return alert("All fields need to be filled!")
     };
@@ -215,27 +260,12 @@ function addItem() {
         return alert("The quantity you want isn't available in stock!")
     };
 
-    if(!validAmount()) {
+    if (!validAmount()) {
         return alert("The number you want to put isn't valid!");
     }
 
-    if(!validAmountInteger()) {
+    if (!validAmountInteger()) {
         return alert("You can't add a quantity isn't integer");
-    } 
-
-    let existingItem = cartItems.findIndex((item) => item.name == productSelect.value);
-
-    if (existingItem !== -1) {
-        cartItems[existingItem].amount = Number(cartItems[existingItem].amount) + Number(amount.value);
-        cartItems[existingItem].total = Number(cartItems[existingItem].amount) * Number(cartItems[existingItem].price);
-        localStorage.setItem("items", JSON.stringify(cartItems))
-
-        getItem();
-        getDetails();
-        showCartItems();
-        clearInputs();
-        showTotal();
-        return;
     }
 
     const item = {
@@ -244,40 +274,68 @@ function addItem() {
         amount: amount.value,
         tax: tax.value,
         total: (price.value * amount.value)
+    };
+
+    try {
+        const response = await fetch('http://localhost/orders', {
+            method: "POST",
+            body: JSON.stringify(item)
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+    } catch (e) {
+        console.error("Erro ao adicionar produto:", e);
     }
 
-    cartItems.push(item);
-
-    localStorage.setItem("items", JSON.stringify(cartItems))
-
-    getItem();
-    getDetails();
+    await getOrderItem();
+    await getItemDetails();
     showCartItems();
     clearInputs();
     showTotal();
+
+    // let existingItem = cartItems.findIndex((item) => item.name == productSelect.value);
+
+    // if (existingItem !== -1) {
+    //     cartItems[existingItem].amount = Number(cartItems[existingItem].amount) + Number(amount.value);
+    //     cartItems[existingItem].total = Number(cartItems[existingItem].amount) * Number(cartItems[existingItem].price);
+    //     localStorage.setItem("items", JSON.stringify(cartItems))
+
+    //     getItem();
+    //     getDetails();
+    //     showCartItems();
+    //     clearInputs();
+    //     showTotal();
+    //     return;
+    // }
 }
 
-btnAddItem.addEventListener("click", addItem)
-productSelect.addEventListener("change", getDetails)
-btnCancel.addEventListener("click", clearTable)
-btnFinish.addEventListener("click", finishPurchase)
+btnAddItem.addEventListener("click", createItem);
+productSelect.addEventListener("change", getItemDetails);
+btnCancel.addEventListener("click", clearTable);
+btnFinish.addEventListener("click", finishPurchase);
 
-setInterval(() => {
-    if (amount.type !== "number") {
-        amount.type = "number";
-    }
-    if (tax.type !== "number") {
-        tax.type = "number";
-    }
-    if (price.type !== "number") {
-        price.type = "number";
-    }
-}, 500);
+// setInterval(() => {
+//     if (amount.type !== "number") {
+//         amount.type = "number";
+//     }
+//     if (tax.type !== "number") {
+//         tax.type = "number";
+//     }
+//     if (price.type !== "number") {
+//         price.type = "number";
+//     }
+// }, 500);
 
-getItem();
-getProducts();
-showCartItems();
-getCategories();
-populateProducts();
-clearInputs();
-showTotal();
+(async () => {
+    await getOrderItem();
+    await getProducts();
+    await getCategories();
+    await getItemDetails();
+    showCartItems();
+    populateProducts();
+    clearInputs();
+    showTotal();
+})()

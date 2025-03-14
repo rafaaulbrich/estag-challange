@@ -2,16 +2,22 @@
 
 include_once("./controller/categoryController.php");
 include_once("./controller/productController.php");
+include_once("./controller/orderController.php");
+include_once("./controller/orderItemController.php");
 
 $categoryController = new CategoryController;
 $productController = new ProductController;
+$orderController = new OrderController;
+$orderItemController = new OrderItemController;
 
 $routes = [
     '/' => 'home',
     '/products' => 'products',
     '/products/id' => 'specificProduct',
     '/categories' => 'categories',
-    '/categories/id' => 'specificCategory'
+    '/categories/id' => 'specificCategory',
+    '/orders' => 'orders',
+    '/orders/id' => 'specificOrder'
 ];
 
 function home() {
@@ -65,6 +71,31 @@ function specificCategory($id) {
     // if($_SERVER['REQUEST_METHOD'] === 'GET') {
     //     global $categoryController;
     //     $categoryController->getCategoryById($id);
+    // }
+}
+
+function orders() {
+    if($_SERVER['REQUEST_METHOD'] === 'POST') {
+        global $orderController;
+        $data = json_decode(file_get_contents('php://input'), true);
+        $orderController->createOrderItem($data);
+    };
+
+    if($_SERVER['REQUEST_METHOD'] === 'GET') {
+        global $orderController;
+        $orderController->getAllOrders();
+    }
+}
+
+function specificOrder($id) {
+    if($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        global $orderController;
+        $orderController->deleteOrder($id);
+    };
+
+    // if($_SERVER['REQUEST_METHOD'] === 'GET') {
+    //     global $orderController;
+    //     $orderController->getOrderById($id);
     // }
 }
 
