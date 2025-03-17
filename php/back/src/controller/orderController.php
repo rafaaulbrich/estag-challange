@@ -40,13 +40,26 @@ class OrderController {
         }
     }
 
-    public function createOrder($data) {
-        $order = new Order($data['total'], $data['tax']);
-        $this->orderRepository->createOrder((array)$order);
+    public function createOrder() {
+        $order = $this->getActiveOrder();
+        if($order) {
+            $this->deleteOrder($order['id']);
+        }
+        $this->orderRepository->createOrder();
     }
 
     public function deleteOrder($id) {
         $this->orderRepository->deleteOrder($id);
+    }
+
+    public function getActiveOrder() {
+        $order = $this->orderRepository->getActiveOrder();
+        if($order) {
+            echo json_encode($order);
+            return $order;
+        } else {
+            echo json_encode([]);
+        }
     }
 }
 

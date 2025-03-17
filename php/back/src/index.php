@@ -6,7 +6,7 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 require_once("./router/router.php");
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-return json_encode(handleRequest($uri, $routes));
+handleRequest($uri, $routes);
 
 $json = file_get_contents('php://input');
 $data = json_encode($json, true);

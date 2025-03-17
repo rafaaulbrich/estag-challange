@@ -17,7 +17,10 @@ $routes = [
     '/categories' => 'categories',
     '/categories/id' => 'specificCategory',
     '/orders' => 'orders',
-    '/orders/id' => 'specificOrder'
+    '/orders/id' => 'specificOrder',
+    '/activeOrder' => 'activeOrder',
+    '/orderItem' => 'orderItem',
+    '/orderItem/id' => 'specificOrderItem',
 ];
 
 function home() {
@@ -77,13 +80,19 @@ function specificCategory($id) {
 function orders() {
     if($_SERVER['REQUEST_METHOD'] === 'POST') {
         global $orderController;
-        $data = json_decode(file_get_contents('php://input'), true);
-        $orderController->createOrderItem($data);
+        $orderController->createOrder();
     };
 
     if($_SERVER['REQUEST_METHOD'] === 'GET') {
         global $orderController;
         $orderController->getAllOrders();
+    }
+}
+
+function activeOrder() {
+    if($_SERVER['REQUEST_METHOD'] === 'GET') {
+        global $orderController;
+        $orderController->getActiveOrder();
     }
 }
 
@@ -97,6 +106,29 @@ function specificOrder($id) {
     //     global $orderController;
     //     $orderController->getOrderById($id);
     // }
+}
+
+function orderItem() {
+    if($_SERVER['REQUEST_METHOD'] === 'POST') {
+        global $orderItemController;
+        $data = json_decode(file_get_contents('php://input'), true);
+        $orderItemController->createOrderItem($data);
+    };
+
+    if($_SERVER['REQUEST_METHOD'] === 'GET') {
+        global $orderItemController;
+        $orderItemController->getAllOrderItems();
+    }
+}
+
+function specificOrderItem($id) {
+    if($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        global $orderItemController;
+        $orderItemController->deleteOrderItem($id);
+    } elseif($_SERVER['REQUEST_METHOD'] === 'GET') {
+        global $orderItemController;
+        $orderItemController->getOrderItemsById($id);
+    }
 }
 
 function handleRequest($uri, $routes) {

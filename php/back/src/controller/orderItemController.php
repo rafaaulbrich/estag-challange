@@ -45,8 +45,23 @@ class OrderItemController {
     }    
 
     public function createOrderItem($data) {
-        $orderItem = new OrderItem($data['name'], $data['amount'], $data['price'], $data['tax']);  
+        $orderItem = new OrderItem(
+            order: $data['order'],
+            product: $data['product'], 
+            amount: $data['amount'],
+            price: $data['price'],
+            tax: $data['tax']);
         $this->orderItemRepository->createOrderItem((array)$orderItem);
+    }
+
+    public function getOrderItemsById($id) {
+        $orderItem = $this->orderItemRepository->getOrderItemsById($id);
+
+        if($orderItem) {
+            echo json_encode($orderItem);
+        } else {
+            echo json_encode([]);
+        }
     }
 
     public function deleteOrderItem($id) {

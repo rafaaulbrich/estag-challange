@@ -5,17 +5,15 @@ include_once("product.php");
 
 class OrderItem {
 
-    public $order;
     public $product;
-    public $name;
+    public $order;
     public $amount;
     public $price;
     public $tax;
 
-    public function __construct($order, $product, $name, $amount, $price, $tax) {
-        $this->order = $order;
+    public function __construct($product, $order, $amount, $price, $tax) {
         $this->product = $product;
-        $this->name = $name;
+        $this->order = $order;
         $this->amount = $amount;
         $this->price = $price;
         $this->tax = $tax;

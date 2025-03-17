@@ -29,14 +29,26 @@ class OrderRepository {
         return $stmt->fetchAll();
     }
 
-    public function createOrder($data) {
-        $stmt = $this->db->getConnection()->prepare("INSERT INTO ORDERS (total, tax) VALUES (:total, :tax)");
-        $stmt->execute(["total" => $data["total"], "tax" => $data["tax"]]);
+    public function createOrder() {
+        $stmt = $this->db->getConnection()->prepare("INSERT INTO ORDERS (total, tax, active) VALUES (0, 0, True)");
+        $stmt->execute();
     }
 
     public function deleteOrder($id) {
-        $stmt = $this->db->getConnection()->prepare("DELETE FROM ORDERS WHERE code = :id");
+        $stmt = $this->db->getConnection()->prepare("UPDATE ORDERS SET active = false WHERE code = :id");
         $stmt->execute(['id' => $id]);
+    }
+
+    public function getActiveOrder() {
+        $stmt = $this->db->getConnection()->prepare("SELECT * FROM ORDERS WHERE active = true");
+        $stmt->execute();
+
+        $orderData = $stmt->fetch(PDO::FETCH_ASSOC);
+        if($orderData) {{
+            return $orderData;
+        }} else {
+            return null;
+        }
     }
 }
 
