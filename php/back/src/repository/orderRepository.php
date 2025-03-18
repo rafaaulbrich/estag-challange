@@ -16,17 +16,17 @@ class OrderRepository {
 
     public function getAllProducts() {
         $stmt = $this->db->getConnection()->query("SELECT * FROM PRODUCTS");
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getAllOrderItems() {
         $stmt = $this->db->getConnection()->query("SELECT * FROM ORDER_ITEM");
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getAllOrders() {
         $stmt = $this->db->getConnection()->query("SELECT * FROM ORDERS");
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function createOrder() {

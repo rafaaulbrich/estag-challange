@@ -25,7 +25,7 @@ class CategoryRepository {
 
     public function getAllCategories() {
         $stmt = $this->db->getConnection()->query("SELECT * FROM CATEGORIES");
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function createCategory($data) {

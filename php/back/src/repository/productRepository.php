@@ -21,7 +21,7 @@ class ProductRepository {
     
     public function getAllCategories() {
         $stmt = $this->db->getConnection()->query("SELECT * FROM CATEGORIES");
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getProductById($id) {
@@ -31,7 +31,7 @@ class ProductRepository {
 
     public function getAllProducts() {
         $stmt = $this->db->getConnection()->query("SELECT * FROM PRODUCTS");
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function createProduct($data) {

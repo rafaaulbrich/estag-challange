@@ -184,7 +184,7 @@ async function deleteItem(id) {
     // localStorage.setItem("items", JSON.stringify(cartItems))
 
     await callApi(id);
-    await getOrders();
+    await getActiveOrder();
     await getItemDetails();
     await showCartItems();
     showTotal();
@@ -205,7 +205,7 @@ async function clearTable() {
         table.innerHTML = ``;
     }
 
-    await getOrders()
+    await getActiveOrder()
     await showCartItems();
     showTotal();
 }
@@ -241,7 +241,7 @@ function showTotal() {
 }
 
 async function finishPurchase() {
-    await getOrders();
+    await getActiveOrder();
 
     if (cartItems.length === 0) {
         return alert("Your cart is empty!");
