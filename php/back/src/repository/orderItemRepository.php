@@ -60,6 +60,11 @@ class OrderItemRepository {
         $stmt->execute(['amount' => $data['amount'], 'id' => $data['code']]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function cancelOrder() {
+        $stmt = $this->db->getConnection()->prepare("DELETE FROM ORDER_ITEM WHERE order_code IN (SELECT order_code FROM ORDER_ITEM INNER JOIN ORDERS ON order_item.order_code = orders.code WHERE orders.active = true)");
+        $stmt->execute();
+    }
 }
 
 ?>

@@ -89,6 +89,22 @@ const getOrderItemsById = async (id) => {
     }
 }
 
+const getOrderItems = async () => {
+    try {
+        const response = await fetch('http://localhost/orderItem', {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        cartItems = await response.json();
+
+    } catch (e) {
+        console.error("Erro ao buscar itens do pedido:", e);
+    }
+}
+
 const getItemDetails = async () => {
     let product = products.find((p) => p.code == productSelect.value);
     let category = categories.find((c) => c.code == product?.category_code);
@@ -191,19 +207,6 @@ function clearInputs() {
     price.value = ""
 }
 
-async function clearTable() {
-    if (cartItems.length === 0) {
-        return alert("Your cart is empty!")
-    } else {
-        alert("Are you sure?")
-        table.innerHTML = "";
-    }
-
-    await getActiveOrder()
-    await showCartItems();
-    showTotal();
-}
-
 // async function validAmountProduct() {
 //     let amountStock = products[products.findIndex((p) => p.code == productSelect.value)].amount;
 //     let findProduct = cartItems[cartItems.findIndex((p) => p.name == productSelect.value)];
@@ -232,6 +235,25 @@ function showTotal() {
 
     taxPrice.innerHTML = `Tax: $${fullTax.toFixed(2)} `;
     total.innerHTML = `Total: $${Number(cartTotal + fullTax).toFixed(2)} `;
+}
+
+async function cancelOrder() {
+    if (cartItems.length === 0) {
+        return alert("Your cart is empty!")
+    } else {
+        !confirm("Are you sure?");
+        const response = await fetch('http://localhost/cancelOrder', {
+            method: "DELETE",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+    }
+
+    await getOrderItems();
+    await showCartItems();
+    showTotal();
 }
 
 async function finishPurchase() {
@@ -362,7 +384,7 @@ const createItem = async () => {
 
 btnAddItem.addEventListener("click", createItem);
 productSelect.addEventListener("change", getItemDetails);
-btnCancel.addEventListener("click", clearTable);
+btnCancel.addEventListener("click", cancelOrder);
 btnFinish.addEventListener("click", finishPurchase);
 
 // setInterval(() => {

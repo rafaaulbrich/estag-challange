@@ -71,6 +71,17 @@ class OrderItemController {
     public function deleteOrderItem($id) {
         $this->orderItemRepository->deleteOrderItem($id);
     }
+
+    public function cancelOrder() {
+        $orderItem = $this->orderItemRepository->cancelOrder();
+
+        if($orderItem) {
+            echo json_encode($orderItem);
+            return $orderItem;
+        } else {
+            echo json_encode([]);
+        }
+    }
 }
 
 ?>

@@ -18,6 +18,7 @@ $routes = [
     '/categories/id' => 'specificCategory',
     '/orders' => 'orders',
     '/orders/id' => 'specificOrder',
+    '/cancelOrder' => 'cancelOrder',
     '/activeOrder' => 'activeOrder',
     '/orderItem' => 'orderItem',
     '/orderItem/id' => 'specificOrderItem',
@@ -87,6 +88,13 @@ function orders() {
     if($_SERVER['REQUEST_METHOD'] === 'GET') {
         global $orderController;
         $orderController->getAllOrders();
+    }
+}
+
+function cancelOrder() {
+    if($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        global $orderItemController;
+        $orderItemController->cancelOrder();
     }
 }
 
