@@ -43,7 +43,7 @@ const getProducts = async () => {
         products = await response.json(products);
 
     } catch (e) {
-        console.error("Erro ao buscar categorias:", e);
+        console.error("Erro ao buscar produtos:", e);
     }
 }
 
@@ -69,7 +69,7 @@ const getActiveOrder = async () => {
         order = await response.json(order);
 
     } catch (e) {
-        console.error("Erro ao buscar categorias:", e);
+        console.error("Erro ao buscar pedidos ativos:", e);
     }
 }
 
@@ -85,7 +85,7 @@ const getOrderItemsById = async (id) => {
         cartItems = await response.json();
 
     } catch (e) {
-        console.error("Erro ao buscar categorias:", e);
+        console.error("Erro ao buscar pedidos pelo id:", e);
     }
 }
 
@@ -101,7 +101,7 @@ const getItemDetails = async () => {
         }
         products = await response.json(product);
     } catch (e) {
-        console.error("Erro ao adicionar produto:", e);
+        console.error("Erro ao buscar produtos para mostrar detalhes:", e);
     }
 
     try {
@@ -113,7 +113,7 @@ const getItemDetails = async () => {
         }
         categories = await response.json(category);
     } catch (e) {
-        console.error("Erro ao adicionar produto:", e);
+        console.error("Erro ao buscar categorias para mostrar detalhes:", e);
     }
     tax.value = `${category?.tax}`;
     price.value = `${product?.price}`;
@@ -174,20 +174,14 @@ function validAmountInteger() {
 }
 
 async function deleteItem(id) {
-    async function callApi(id) {
-        await fetch('http://localhost/orderItem' + id, {
-            method: 'DELETE'
-        })
-    }
-    // cartItems = cartItems.filter((_, i) => i !== index);
+    await fetch(`http://localhost/orderItem/${id}`, {
+        method: 'DELETE'
+    })
 
-    // localStorage.setItem("items", JSON.stringify(cartItems))
-
-    await callApi(id);
-    await getActiveOrder();
-    await getItemDetails();
+    await getProducts();
+    await getOrderItemsById(order.code);
+    await getOrCreateOrder();
     await showCartItems();
-    showTotal();
 }
 
 function clearInputs() {
@@ -202,7 +196,7 @@ async function clearTable() {
         return alert("Your cart is empty!")
     } else {
         alert("Are you sure?")
-        table.innerHTML = ``;
+        table.innerHTML = "";
     }
 
     await getActiveOrder()
@@ -289,10 +283,46 @@ async function createOrder() {
 async function getOrCreateOrder() {
     await getActiveOrder()
 
-    if(!order.code) {
+    if (!order.code) {
         await createOrder();
         await getActiveOrder();
     }
+}
+
+async function addOrIncrement(item) {
+    let existingItem = cartItems.find((val) => val.product_code == productSelect.value);
+    
+    if (existingItem) {
+        try {
+            const response = await fetch('http://localhost/orderItemIncrement', {
+                method: "POST",
+                body: JSON.stringify({
+                    ...existingItem,
+                    amount: Number(existingItem.amount) + Number(amount.value)
+                })
+            })
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+        } catch (e) {
+            console.error("Erro ao enviar produtos para incrementar:", e);
+        }
+    } else {
+        try {
+            const response = await fetch('http://localhost/orderItem', {
+                method: "POST",
+                body: JSON.stringify(item)
+            })
+
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+
+        } catch (e) {
+            console.error("Erro ao adicionar item:", e);
+        }
+    }
+
 }
 
 const createItem = async () => {
@@ -306,13 +336,6 @@ const createItem = async () => {
         amount: amount.value,
         tax: tax.value,
     };
-    
-    let existingItem = cartItems.findIndex((item) => item.product == productSelect.value);
-
-    if (existingItem !== -1) {
-        cartItems[existingItem].amount = Number(cartItems[existingItem].amount) + Number(amount.value);
-        cartItems[existingItem].total = Number(cartItems[existingItem].amount) * Number(cartItems[existingItem].price);
-    }
 
     if (!validInputs()) {
         return alert("All fields need to be filled!")
@@ -330,32 +353,11 @@ const createItem = async () => {
         return alert("You can't add a quantity isn't integer");
     }
 
-    try {
-        const response = await fetch('http://localhost/orderItem', {
-            method: "POST",
-            body: JSON.stringify(item)
-        })
-
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-    } catch (e) {
-        console.error("Erro ao adicionar produto:", e);
-    }
-
+    await addOrIncrement(item);
     await getOrderItemsById(order.code);
     await showCartItems();
     clearInputs();
     showTotal();
-
-    //     getItem();
-    //     getDetails();
-    //     showCartItems();
-    //     clearInputs();
-    //     showTotal();
-    //     return;
-    // }
 }
 
 btnAddItem.addEventListener("click", createItem);

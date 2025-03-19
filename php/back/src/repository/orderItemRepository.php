@@ -5,7 +5,7 @@ require_once("./model/order.php");
 require_once("./controller/orderItemController.php");
 require_once("./model/product.php");
 require_once("./controller/productController.php");
-error_log("arquivo");
+
 class OrderItemRepository {
     
     public $db;
@@ -52,6 +52,12 @@ class OrderItemRepository {
     public function getOrderItemsById($id) {
         $stmt = $this->db->getConnection()->prepare("SELECT * FROM ORDER_ITEM WHERE ORDER_CODE = :id");
         $stmt->execute(['id' => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function incrementAmountOrderItem($data) {
+        $stmt = $this->db->getConnection()->prepare("UPDATE ORDER_ITEM SET amount = :amount WHERE code = :id");
+        $stmt->execute(['amount' => $data['amount'], 'id' => $data['code']]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

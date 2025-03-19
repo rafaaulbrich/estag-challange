@@ -21,6 +21,7 @@ $routes = [
     '/activeOrder' => 'activeOrder',
     '/orderItem' => 'orderItem',
     '/orderItem/id' => 'specificOrderItem',
+    '/orderItemIncrement' => 'incrementOrderItem',
 ];
 
 function home() {
@@ -128,6 +129,14 @@ function specificOrderItem($id) {
     } elseif($_SERVER['REQUEST_METHOD'] === 'GET') {
         global $orderItemController;
         $orderItemController->getOrderItemsById($id);
+    };
+}
+
+function incrementOrderItem() {
+    if($_SERVER['REQUEST_METHOD'] === 'POST') {
+        global $orderItemController;
+        $data = json_decode(file_get_contents('php://input'), true);
+        $orderItemController->incrementAmountOrderItem($data);
     }
 }
 

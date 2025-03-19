@@ -64,6 +64,10 @@ class OrderItemController {
         }
     }
 
+    public function incrementAmountOrderItem($data) {
+        $this->orderItemRepository->incrementAmountOrderItem($data);
+    }
+
     public function deleteOrderItem($id) {
         $this->orderItemRepository->deleteOrderItem($id);
     }

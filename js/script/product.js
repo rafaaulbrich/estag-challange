@@ -34,13 +34,39 @@ const getProducts =  async () => {
     products = await response.json(products);
 }
 
+let order = {};
+
+const getActiveOrder = async () => {
+    try {
+        const response = await fetch('http://localhost/activeOrder', {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        order = await response.json(order);
+
+    } catch (e) {
+        console.error("Erro ao buscar pedidos ativos:", e);
+    }
+}
+
 let cartItems = [];
 
-function getItem() {
-    if (localStorage.getItem("items")) {
-        cartItems = JSON.parse(localStorage.getItem("items"))
-    } else {
-        cartItems = []
+const getOrderItemsById = async (id) => {
+    try {
+        const response = await fetch(`http://localhost/orderItem/${id}`, {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        cartItems = await response.json();
+
+    } catch (e) {
+        console.error("Erro ao buscar itens da compra pelo id:", e);
     }
 }
 
@@ -66,7 +92,7 @@ function showProducts() {
                 <td>${product.name}</td>
                 <td>${Number(product.amount)} units</td>
                 <td>$${Number(product.price).toFixed(2)}</td>
-                <td>${categories.find((c) => c.code === product.category_code).name}</td>
+                <td>${categories.find((c) => c.code === product.category_code)?.name}</td>
                 <td class="last-elem"><button id="btn-table" onclick="deleteProduct(${product.code})">Delete</button></td>
             </tr>
         </table>
@@ -109,25 +135,22 @@ function validPrice() {
 }
 
 async function deleteProduct(id) {
-    async function callApi(id) {
-        await fetch('http://localhost/products/' + id, {
-            method: 'DELETE'
-        });
+    const existingItem = cartItems.find((order) => order.product_code == id);
+    
+    if(existingItem) {
+        return alert("Can't delete the product because it's in your cart!");
+    } else {
+        const response = await fetch(`http://localhost/products/${id}`, {
+            method: "DELETE",
+        })
+    
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
     }
 
-    // const item = cartItems.findIndex((c) => c.name == products[index].name);
-
-    // if(item !== -1) {
-    //     alert("Can't delete the product because it's in your cart!")
-    //     return true;
-    // } else {
-    //     products = products.filter((_, i) => i !== index);
-    //     localStorage.setItem("products", JSON.stringify(products))
-    // }
-
-    await callApi(id);
     await getProducts();
-    getItem();
+    await getCategories();
     showProducts();
 }
 
@@ -138,7 +161,7 @@ function clearInputs() {
     category.value = ""
 }
 
-const createProduct = async () => {
+async function createProduct() {
 
     if(!validInputs()) {
         return alert("All fields need to be filled!")
@@ -212,8 +235,10 @@ btnAddProduct.addEventListener("click", createProduct);
 (async () => {
     await getProducts();
     await getCategories();
-    showProducts();
+    await getActiveOrder();
+    await getOrderItemsById(order.code);
     populateCategories();
+    showProducts();
     clearInputs();
     validProductName();
     validInputs();
