@@ -71,26 +71,23 @@ function validTax() {
 }
 
 async function deleteCategory(id) {
-    async function callApi(id) {
-        await fetch('http://localhost/categories/' + id, {
-            method: 'DELETE'
-        });
+    let existingItem = products.find((product) => product.category_code == id);
+
+    if(existingItem) {
+        return alert("Can't delete the category because there's a product using it!");
+    } else {
+        const response = await fetch(`http://localhost/categories/${id}`, {
+            method: "DELETE",
+        })
+    
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
     }
 
-    await callApi(id);
     await getCategories();
     await getProducts();
     showCategories();
-
-    // const product = products.findIndex((p) => p.category == categories[index].name);
-
-    // if (product !== -1) {
-    //     alert("The category you want to delete is being used!");
-    //     return true
-    // } else {
-    // categories = categories.filter((_, i) => i !== index);
-    // localStorage.setItem("categories", JSON.stringify(categories))
-    // }
 }
 
 function clearInputs() {
@@ -112,7 +109,6 @@ const createCategory = async () => {
         return alert("The number you want to put isn't valid!");
     };
 
-
     const category = {
         code: categories.length > 0 ? categories[categories.length - 1].code + 1 : 1,
         name: categoryName.value,
@@ -133,17 +129,6 @@ const createCategory = async () => {
         console.error("Erro ao adicionar categoria:", e);
     }
 
-    // let existingItem = categories.findIndex((category) => category.name === categoryName.value);
-
-    // if (existingItem !== -1) {
-    //     alert("This category already exists");
-    //     clearInputs();
-    //     return false;
-
-    // }
-
-    // localStorage.setItem("categories", JSON.stringify(categories));
-
     await getCategories();
     showCategories();
     clearInputs();
@@ -162,6 +147,7 @@ btnAddCategory.addEventListener("click", createCategory);
 
 (async () => {
     await getCategories();
+    await getProducts();
     showCategories();
     validCategoryName();
     validInputs();

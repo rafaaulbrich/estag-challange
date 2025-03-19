@@ -135,7 +135,7 @@ function validPrice() {
 }
 
 async function deleteProduct(id) {
-    const existingItem = cartItems.find((order) => order.product_code == id);
+    let existingItem = cartItems.find((order) => order.product_code == id);
     
     if(existingItem) {
         return alert("Can't delete the product because it's in your cart!");
