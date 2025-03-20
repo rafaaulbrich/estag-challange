@@ -46,8 +46,9 @@ class OrderItemController {
 
     public function createOrderItem($data) {
         $orderItem = new OrderItem(
-            order: $data['order'],
             product: $data['product'], 
+            order: $data['order'],
+            name: $data['name'],
             amount: $data['amount'],
             price: $data['price'],
             tax: $data['tax']);

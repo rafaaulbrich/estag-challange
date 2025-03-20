@@ -60,6 +60,10 @@ class ProductController {
     public function deleteProduct($id) {
         $this->productRepository->deleteProduct($id);
     }
+
+    public function decrementAmountStock($data) {
+        $this->productRepository->decrementAmountStock($data);
+    }
 }
 
 ?>

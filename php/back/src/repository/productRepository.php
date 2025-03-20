@@ -30,7 +30,7 @@ class ProductRepository {
     }
 
     public function getAllProducts() {
-        $stmt = $this->db->getConnection()->query("SELECT * FROM PRODUCTS");
+        $stmt = $this->db->getConnection()->query("SELECT * FROM PRODUCTS ORDER BY code");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -42,6 +42,12 @@ class ProductRepository {
     public function deleteProduct($id) {
         $stmt = $this->db->getConnection()->prepare("DELETE FROM PRODUCTS WHERE code = :id");
         $stmt->execute(['id' => $id]);
+    }
+
+    public function decrementAmountStock($data) {
+        $stmt = $this->db->getConnection()->prepare("UPDATE PRODUCTS SET amount = :amount WHERE code = :id");
+        $stmt->execute(['amount' => $data['amount'], 'id' => $data['code']]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 }

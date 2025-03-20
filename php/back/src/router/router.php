@@ -19,10 +19,14 @@ $routes = [
     '/orders' => 'orders',
     '/orders/id' => 'specificOrder',
     '/cancelOrder' => 'cancelOrder',
+    '/currentOrder' => 'currentOrder',
+    '/ordersInactive' => 'ordersInactive',
     '/activeOrder' => 'activeOrder',
+    '/updateOrder' => 'updateOrder',
     '/orderItem' => 'orderItem',
     '/orderItem/id' => 'specificOrderItem',
     '/orderItemIncrement' => 'incrementOrderItem',
+    '/orderItemDecrement' => 'decrementOrderItem',
 ];
 
 function home() {
@@ -105,6 +109,28 @@ function activeOrder() {
     }
 }
 
+function currentOrder() {
+    if($_SERVER['REQUEST_METHOD'] === 'GET') {
+        global $orderController;
+        $orderController->currentOrder();
+    }
+}
+
+function ordersInactive() {
+    if($_SERVER['REQUEST_METHOD'] === 'GET') {
+        global $orderController;
+        $orderController->getAllOrdersInactive();
+    }
+}
+
+function updateOrder() {
+    if($_SERVER['REQUEST_METHOD'] === 'POST') {
+        global $orderController;
+        $data = json_decode(file_get_contents('php://input'), true);
+        $orderController->updateOrder($data);
+    }
+}
+
 function specificOrder($id) {
     if($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         global $orderController;
@@ -145,6 +171,14 @@ function incrementOrderItem() {
         global $orderItemController;
         $data = json_decode(file_get_contents('php://input'), true);
         $orderItemController->incrementAmountOrderItem($data);
+    }
+}
+
+function decrementOrderItem() {
+    if($_SERVER['REQUEST_METHOD'] === 'POST') {
+        global $productController;
+        $data = json_decode(file_get_contents('php://input'), true);
+        $productController->decrementAmountStock($data);
     }
 }
 

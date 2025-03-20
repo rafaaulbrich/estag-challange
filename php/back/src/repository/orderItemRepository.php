@@ -36,9 +36,10 @@ class OrderItemRepository {
     }
 
     public function createOrderItem($data) {
-        $stmt = $this->db->getConnection()->prepare("INSERT INTO ORDER_ITEM (order_code, product_code, amount, price, tax) VALUES (:order, :product, :amount, :price, :tax)");
-        $stmt->execute(["order" => $data["order"],
-                        "product" =>$data["product"], 
+        $stmt = $this->db->getConnection()->prepare("INSERT INTO ORDER_ITEM (product_code, order_code, name, amount, price, tax) VALUES (:product, :order, :name, :amount, :price, :tax)");
+        $stmt->execute(["product" => $data["product"],
+                        "order" => $data["order"], 
+                        "name" => $data["name"],
                         "amount" => $data["amount"], 
                         "price" => $data["price"], 
                         "tax" => $data["tax"]]);

@@ -50,6 +50,28 @@ class OrderRepository {
             return null;
         }
     }
+
+    public function currentOrder() {
+        $stmt = $this->db->getConnection()->prepare("UPDATE ORDERS SET active = false WHERE active = true");
+        $stmt->execute();
+    }
+
+    public function getAllOrdersInactive() {
+        $stmt = $this->db->getConnection()->query("SELECT * FROM ORDERS WHERE active = false");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function updateOrder($data) {
+        $stmt = $this->db->getConnection()->prepare("UPDATE ORDERS SET total = :total, tax = :tax WHERE code = :id");
+        $stmt->execute(['total' => $data['total'], 'tax' => $data['tax'], 'id' => $data['id']]);    
+
+        $orderData = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($orderData) {
+            return $orderData;
+        } else {
+            return null;
+        }
+    }
 }
 
 ?>

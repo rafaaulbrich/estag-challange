@@ -31,10 +31,11 @@ class OrderController {
     } 
 
     public function getAllOrders() {
-        $order = $this->orderRepository->getAllOrders();
+        $orders = $this->orderRepository->getAllOrders();
 
-        if ($order) {
-            echo json_encode($order);
+        if ($orders) {
+            echo json_encode($orders);
+            return $orders;
         } else {
             echo json_encode([]);
         }
@@ -42,8 +43,9 @@ class OrderController {
 
     public function createOrder() {
         $order = $this->getActiveOrder();
+
         if($order) {
-            $this->deleteOrder($order['id']);
+            $this->deleteOrder($order['code']);
         }
         $this->orderRepository->createOrder();
     }
@@ -54,12 +56,37 @@ class OrderController {
 
     public function getActiveOrder() {
         $order = $this->orderRepository->getActiveOrder();
+
         if($order) {
             echo json_encode($order);
             return $order;
         } else {
             echo json_encode([]);
         }
+    }
+
+    public function currentOrder() {
+        $order = $this->orderRepository->currentOrder();
+
+        if($order) {
+            echo json_encode($order);
+        } else {
+            echo json_encode([]);
+        }
+    }
+
+    public function getAllOrdersInactive() {
+        $ordersInactive = $this->orderRepository->getAllOrdersInactive();
+        if($ordersInactive) {
+            echo json_encode($ordersInactive);
+            return $ordersInactive;
+        } else {
+            echo json_encode([]);
+        }
+    }
+
+    public function updateOrder($data) {
+        $this->orderRepository->updateOrder($data);
     }
 }
 

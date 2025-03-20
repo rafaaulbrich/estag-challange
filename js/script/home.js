@@ -105,6 +105,38 @@ const getOrderItems = async () => {
     }
 }
 
+const getCurrentOrder = async () => {
+    try {
+        const response = await fetch('http://localhost/currentOrder', {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        cartItems = await response.json();
+
+    } catch (e) {
+        console.error("Erro ao buscar pedido atual:", e);
+    }
+}
+
+const getAllOrdersInactive = async () => {
+    try {
+        const response = await fetch('http://localhost/ordersInactive', {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        cartItems = await response.json();
+
+    } catch (e) {
+        console.error("Erro ao buscar pedidos inativos:", e);
+    }
+}
+
 const getItemDetails = async () => {
     let product = products.find((p) => p.code == productSelect.value);
     let category = categories.find((c) => c.code == product?.category_code);
@@ -165,8 +197,8 @@ async function showCartItems() {
             </tr >
         </table >
         `;
-        showTotal();
     }
+    await showTotal();
 }
 
 function validInputs() {
@@ -194,10 +226,10 @@ async function deleteItem(id) {
         method: 'DELETE'
     })
 
-    await getProducts();
+    await getActiveOrder();
     await getOrderItemsById(order.code);
-    await getOrCreateOrder();
     await showCartItems();
+    await showTotal();
 }
 
 function clearInputs() {
@@ -207,30 +239,33 @@ function clearInputs() {
     price.value = ""
 }
 
-// async function validAmountProduct() {
-//     let amountStock = products[products.findIndex((p) => p.code == productSelect.value)].amount;
-//     let findProduct = cartItems[cartItems.findIndex((p) => p.name == productSelect.value)];
-//     let amountCart = 0;
-
-//     if (findProduct !== -1) {
-//         amountCart = cartItems[findProduct].amount
-//     }
-
-//     if (Number(amountCart) + Number(amount.value) > Number(amountStock)) {
-//         return false
-//     }
-//     return true;
-// }
-
 let cartTotal = 0;
 let fullTax = 0;
 
-function showTotal() {
+async function showTotal() {
     cartTotal = 0;
     fullTax = 0;
+
     for (item of cartItems) {
         cartTotal = Number(cartTotal) + Number(item.price) * Number(item.amount);
         fullTax = Number(fullTax) + ((Number(item.tax) / 100) * Number(item.price) * Number(item.amount))
+    }
+
+    try {
+        const response = await fetch('http://localhost/updateOrder', {
+            method: "POST",
+            body: JSON.stringify({
+                tax: fullTax,
+                total: cartTotal,
+                id: order.code
+            })
+        })
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+    } catch (e) {
+        console.error("Erro ao atualizar pedido:", e);
     }
 
     taxPrice.innerHTML = `Tax: $${fullTax.toFixed(2)} `;
@@ -253,53 +288,54 @@ async function cancelOrder() {
 
     await getOrderItems();
     await showCartItems();
-    showTotal();
+    await showTotal();
 }
 
 async function finishPurchase() {
-    await getActiveOrder();
-
     if (cartItems.length === 0) {
         return alert("Your cart is empty!");
     }
-    let history = JSON.parse(localStorage.getItem("history")) || [];
-    let purchase = {
-        code: history.length > 0 ? history[history.length - 1].code + 1 : 1,
-        tax: Number(fullTax).toFixed(2),
-        total: (Number(fullTax) + Number(cartTotal)).toFixed(2),
-        products: [...cartItems]
-    };
 
-    history.push(purchase);
-    localStorage.setItem("history", JSON.stringify(history));
+    window.location.href = './history.html';
 
-    let products = JSON.parse(localStorage.getItem("products")) || [];
-    cartItems.forEach((item) => {
-        let productIndex = products.findIndex((p) => p.name == item.name);
+    cartItems.forEach(async (item) => {
+        let product = products.find((p) => p.code == item.product_code);
 
-        if (products[productIndex].amount !== -1) {
-            products[productIndex].amount -= item.amount;
-
-            if (products[productIndex].amount < 0) {
-                products[productIndex].amount = 0
+        try {
+            const response = await fetch('http://localhost/orderItemDecrement', {
+                method: "POST",
+                body: JSON.stringify({
+                    code: product.code,
+                    amount: Number(product?.amount) - Number(item.amount)
+                })
+            })
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
             }
+        } catch (e) {
+            console.error("Erro ao decrementar quantidade do estoque:", e);
         }
     }
-    )
-    localStorage.setItem("products", JSON.stringify(products))
-    localStorage.setItem("items", JSON.stringify([]));
+)
 
-    window.location.href = './history.html'
+    await createOrder();
+    await getActiveOrder();
+    await getOrderItemsById(order.code);
+    await showTotal();
+    await showCartItems();
 }
 
 async function createOrder() {
-    const response = await fetch('http://localhost/order', {
+    const response = await fetch('http://localhost/orders', {
         method: 'POST',
     })
 
     if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
     }
+
+    await showTotal();
+    await showCartItems();
 }
 
 async function getOrCreateOrder() {
@@ -313,7 +349,7 @@ async function getOrCreateOrder() {
 
 async function addOrIncrement(item) {
     let existingItem = cartItems.find((val) => val.product_code == productSelect.value);
-    
+
     if (existingItem) {
         try {
             const response = await fetch('http://localhost/orderItemIncrement', {
@@ -354,6 +390,7 @@ const createItem = async () => {
     const item = {
         order: order.code,
         product: productSelect.value,
+        name: name.value,
         price: price.value,
         amount: amount.value,
         tax: tax.value,
@@ -363,7 +400,7 @@ const createItem = async () => {
         return alert("All fields need to be filled!")
     };
 
-    // if (!validAmountProduct()) {
+    // if (!validAndDecrement()) {
     //     return alert("The quantity you want isn't available in stock!")
     // };
 
@@ -376,10 +413,11 @@ const createItem = async () => {
     }
 
     await addOrIncrement(item);
+    // await validAndDecrement(item);
     await getOrderItemsById(order.code);
     await showCartItems();
+    await showTotal();
     clearInputs();
-    showTotal();
 }
 
 btnAddItem.addEventListener("click", createItem);
@@ -405,7 +443,7 @@ btnFinish.addEventListener("click", finishPurchase);
     await getOrCreateOrder();
     await getOrderItemsById(order.code);
     await showCartItems();
-    showTotal();
+    await showTotal();
     populateProducts();
     clearInputs();
 })()

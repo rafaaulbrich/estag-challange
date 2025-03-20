@@ -1,19 +1,66 @@
-// const table = document.getElementById("table");
+const table = document.getElementById("table");
 const modal = document.getElementById("modal-container");
 const purchaseDetails = document.getElementById("purchaseDetails");
-const btnModal = document.getElementById("btnModal");
 const btnClose = document.getElementById("close");
 
 let products = [];
+let cartItems = [];
 
-function showPurchases() {
-    let history = JSON.parse(localStorage.getItem("history")) ?? []
+const getProducts = async () => {
+    try {
+        const response = await fetch('http://localhost/products', {
+            method: "GET",
+        })
 
-    if (history.length === 0) {
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        products = await response.json(products);
+
+    } catch (e) {
+        console.error("Erro ao buscar produtos:", e);
+    }
+}
+
+const getOrderItemsById = async (id) => {
+    try {
+        const response = await fetch(`http://localhost/orderItem/${id}`, {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        cartItems = await response.json();
+
+    } catch (e) {
+        console.error("Erro ao buscar pedidos pelo id:", e);
+    }
+}
+
+const getAllOrdersInactive = async () => {
+    try {
+        const response = await fetch('http://localhost/ordersInactive', {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        cartItems = await response.json();
+
+    } catch (e) {
+        console.error("Erro ao buscar pedidos inativos:", e);
+    }
+}
+
+async function showPurchases() {
+    if (cartItems.length === 0) {
         table.innerHTML = "<p>No purchase history avaible</p>"
-        return;
+        return; 
 
     }
+
     table.innerHTML = `
     <table>
         <tr>
@@ -24,54 +71,55 @@ function showPurchases() {
         </tr>
     </table>
     `;
-
-    history.forEach((item, index) => {
+    cartItems.forEach((item) => {
         table.innerHTML += `
             <tr>
                 <td>${item.code}</td>
                 <td>$${Number(item.tax).toFixed(2)}</td>
                 <td>$${Number(item.total).toFixed(2)}</td>
                 <td class="last-elem">
-                    <button onclick="getPurchaseDetails(${index})" class="finish" id="btnModal">View</button>
+                    <button onclick="getPurchaseDetails(${item.code}, ${item.tax}, ${item.total})" class="finish" id="btnModal">View</button>
                 </td>
             </tr>
         `;
     });
 }
 
-function getPurchaseDetails(index) {
-    let history = JSON.parse(localStorage.getItem("history")) ?? [];
-    let purchase = history[index];
+async function getPurchaseDetails(id, tax, total) {
+    await getOrderItemsById(id);
 
-    purchaseDetails.innerHTML = `
-    <div class="modal-header">
-        <h1>Purchase #${purchase.code}</h1>
-        <h5>Total: $${purchase.total}</h5>
-        <h5>Tax: $${purchase.tax}</h5>
-        <button onclick="closeModal()" class="close" id="close">X</button>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Unit price</th>
-                <th>Amount</th>
-                <th class="last-elem">Total</th>
-                </tr>
-        </thead>
-        <tbody id="table-history-body">
-        </tbody>
-    </table>
-    `;
+    cartItems.forEach((item) => {
+        purchaseDetails.innerHTML = `
+        <div class="modal-header">
+            <h1>Purchase #${id}</h1>
+            <h5>Total: $${Number(total).toFixed(2)}</h5>
+            <h5>Tax: $${Number(tax).toFixed(2)}</h5>
+            <button onclick="closeModal()" class="close" id="close">X</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Unit price</th>
+                    <th>Amount</th>
+                    <th class="last-elem">Total</th>
+                    </tr>
+            </thead>
+            <tbody id="table-history-body">
+            </tbody>
+        </table>
+        `;
+
+    })
 
     const tableBody = document.getElementById("table-history-body")
-    purchase.products.forEach((item) => {
+    cartItems.forEach((item) => {
         tableBody.innerHTML += `
         <tr>
-            <td>${item.name}</td>
+            <td>${products.find((p) => p.code == item.product_code).name}</td>
             <td>$${Number(item.price).toFixed(2)}</td>
             <td>${item.amount} units</td>
-            <td class="last-elem">$${Number(item.total).toFixed(2)}</td>
+            <td class="last-elem">$${Number(Number(item.price).toFixed(2) * Number(item.amount))}</td>
         </tr>
         `;
     })
@@ -87,8 +135,11 @@ function closeModal() {
     modal.style.display = 'none'
 }
 
-btnModal.addEventListener("click", getPurchaseDetails)
-btnClose.addEventListener("click", closeModal)
+btnClose.addEventListener("click", closeModal);
 
-showPurchases();
-closeModal();
+(async () => {
+    await getAllOrdersInactive();
+    await showPurchases();
+    await getProducts();
+    closeModal();
+})()
