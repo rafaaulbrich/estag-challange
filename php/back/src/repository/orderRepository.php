@@ -57,7 +57,7 @@ class OrderRepository {
     }
 
     public function getAllOrdersInactive() {
-        $stmt = $this->db->getConnection()->query("SELECT * FROM ORDERS WHERE active = false");
+        $stmt = $this->db->getConnection()->query("SELECT * FROM ORDERS WHERE active = false ORDER BY code");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
