@@ -20,13 +20,13 @@ function populateCategories() {
         category.innerHTML += `
             <option value="${c.code}" id="category">${c.name}</option>
         `;
-    category.value = selectedValue;
+        category.value = selectedValue;
     })
 }
 
 let products = [];
 
-const getProducts =  async () => {
+const getProducts = async () => {
     const response = await fetch('http://localhost/products', {
         method: 'GET'
     })
@@ -70,6 +70,24 @@ const getOrderItemsById = async (id) => {
     }
 }
 
+const getHistoryItem = async (id) => {
+    try {
+        const response = await fetch(`http://localhost/historyOrderItem/${id}`, {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        
+        const purchases = await response.json(); 
+        return purchases.length; 
+
+    } catch (e) {
+        console.error("Erro ao buscar itens que já foram comprados:", e);
+    }
+}
+
 function showProducts() {
     table.innerHTML = `
     <table>
@@ -84,7 +102,7 @@ function showProducts() {
     </table>
     `;
 
-    for(let product of products) {
+    for (let product of products) {
         table.innerHTML += `
         <table>
             <tr>
@@ -101,34 +119,34 @@ function showProducts() {
 }
 
 function validInputs() {
-    if(!productName.value || !amount.value || !price.value || !category.value) {
+    if (!productName.value || !amount.value || !price.value || !category.value) {
         return false
     }
     return true
 }
 
 function validProductName() {
-    if(!/^[0-9a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]*$/g.test(productName.value)) {
+    if (!/^[0-9a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ'\s]*$/g.test(productName.value)) {
         return false
     }
     return true
 }
 
 function validAmount() {
-    if(amount.value <= 0) {
+    if (amount.value <= 0) {
         return false
     }
     return true
 }
 
 function validAmountInteger() {
-    if(amount.value % 1 === 0) {
+    if (amount.value % 1 === 0) {
         return amount.value
     }
 }
 
 function validPrice() {
-    if(price.value <= 0) {
+    if (price.value <= 0) {
         return false
     }
     return true
@@ -136,14 +154,21 @@ function validPrice() {
 
 async function deleteProduct(id) {
     let existingItem = cartItems.find((order) => order.product_code == id);
-    
-    if(existingItem) {
+    if (existingItem) {
         return alert("Can't delete the product because it's in your cart!");
-    } else {
+    } 
+    
+    let existingHistory = await getHistoryItem(id);
+    console.log(existingHistory)
+    if (existingHistory) {
+        return alert("Can't delete the product because it's in your purchase history!");  
+    } 
+    
+    else {
         const response = await fetch(`http://localhost/products/${id}`, {
             method: "DELETE",
         })
-    
+
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
@@ -163,34 +188,34 @@ function clearInputs() {
 
 async function createProduct() {
 
-    if(!validInputs()) {
+    if (!validInputs()) {
         return alert("All fields need to be filled!")
     };
 
-    if(!validProductName()) {
+    if (!validProductName()) {
         return alert("The field product name aceppts only letters")
     };
 
-    if(!validAmount()) {
+    if (!validAmount()) {
         return alert("The number you want to put isn't valid!");
     };
 
-    if(!validAmountInteger()) {
+    if (!validAmountInteger()) {
         return alert("You can't add a quantity isn't integer");
-    } 
+    }
 
-    if(!validPrice()) {
+    if (!validPrice()) {
         return alert("The number you want to put isn't valid!");
     };
-    
+
     const product = {
-        code: products.length > 0 ? products[products.length -1].code + 1 : 1,
+        code: products.length > 0 ? products[products.length - 1].code + 1 : 1,
         name: productName.value,
         amount: amount.value,
         price: price.value,
         category: category.value,
     };
-    
+
     try {
         const response = await fetch('http://localhost/products', {
             method: "POST",
@@ -200,13 +225,13 @@ async function createProduct() {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-        
+
     } catch (e) {
         console.error("Erro ao adicionar produto:", e);
     }
-    
+
     // let existingItem = products.findIndex((product) => product.name === productName.value);
- 
+
     // if (existingItem !== -1) {
     //   alert("This product already exists");
     //   clearInputs();

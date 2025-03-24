@@ -48,7 +48,6 @@ class OrderItemController {
         $orderItem = new OrderItem(
             product: $data['product'], 
             order: $data['order'],
-            name: $data['name'],
             amount: $data['amount'],
             price: $data['price'],
             tax: $data['tax']);
@@ -71,6 +70,16 @@ class OrderItemController {
 
     public function deleteOrderItem($id) {
         $this->orderItemRepository->deleteOrderItem($id);
+    }
+
+    public function getHistoryItem($id) {
+        $orderItem = $this->orderItemRepository->getHistoryItem($id);
+
+        if($orderItem) {
+            echo json_encode($orderItem);
+        } else {
+            echo json_encode([]);
+        }
     }
 
     public function cancelOrder() {

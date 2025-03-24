@@ -76,7 +76,7 @@ async function showPurchases() {
             <tr>
                 <td>${item.code}</td>
                 <td>$${Number(item.tax).toFixed(2)}</td>
-                <td>$${Number(item.total).toFixed(2)}</td>
+                <td>$${(Number(item.total) + Number(item.tax)).toFixed(2)}</td>
                 <td class="last-elem">
                     <button onclick="getPurchaseDetails(${item.code}, ${item.tax}, ${item.total})" class="finish" id="btnModal">View</button>
                 </td>
@@ -88,11 +88,11 @@ async function showPurchases() {
 async function getPurchaseDetails(id, tax, total) {
     await getOrderItemsById(id);
 
-    cartItems.forEach((item) => {
+    cartItems.forEach(() => {
         purchaseDetails.innerHTML = `
         <div class="modal-header">
             <h1>Purchase #${id}</h1>
-            <h5>Total: $${Number(total).toFixed(2)}</h5>
+            <h5>Total: $${(Number(total) + Number(tax)).toFixed(2)}</h5>
             <h5>Tax: $${Number(tax).toFixed(2)}</h5>
             <button onclick="closeModal()" class="close" id="close">X</button>
         </div>

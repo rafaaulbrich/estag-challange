@@ -36,10 +36,9 @@ class OrderItemRepository {
     }
 
     public function createOrderItem($data) {
-        $stmt = $this->db->getConnection()->prepare("INSERT INTO ORDER_ITEM (product_code, order_code, name, amount, price, tax) VALUES (:product, :order, :name, :amount, :price, :tax)");
+        $stmt = $this->db->getConnection()->prepare("INSERT INTO ORDER_ITEM (product_code, order_code, amount, price, tax) VALUES (:product, :order, :amount, :price, :tax)");
         $stmt->execute(["product" => $data["product"],
                         "order" => $data["order"], 
-                        "name" => $data["name"],
                         "amount" => $data["amount"], 
                         "price" => $data["price"], 
                         "tax" => $data["tax"]]);
@@ -59,6 +58,12 @@ class OrderItemRepository {
     public function incrementAmountOrderItem($data) {
         $stmt = $this->db->getConnection()->prepare("UPDATE ORDER_ITEM SET amount = :amount WHERE code = :id");
         $stmt->execute(['amount' => $data['amount'], 'id' => $data['code']]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getHistoryItem($id) {
+        $stmt = $this->db->getConnection()->prepare("SELECT * FROM order_item INNER JOIN orders ON order_item.order_code = orders.code WHERE orders.active = false AND order_item.product_code = :id");
+        $stmt->execute(['id' => $id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

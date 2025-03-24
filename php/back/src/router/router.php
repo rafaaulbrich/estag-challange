@@ -27,6 +27,7 @@ $routes = [
     '/orderItem/id' => 'specificOrderItem',
     '/orderItemIncrement' => 'incrementOrderItem',
     '/orderItemDecrement' => 'decrementOrderItem',
+    '/historyOrderItem/id' => 'historyOrderItem',
 ];
 
 function home() {
@@ -179,6 +180,13 @@ function decrementOrderItem() {
         global $productController;
         $data = json_decode(file_get_contents('php://input'), true);
         $productController->decrementAmountStock($data);
+    }
+}
+
+function historyOrderItem($id) {
+    if($_SERVER['REQUEST_METHOD'] === 'GET') {
+        global $orderItemController;
+        $orderItemController->getHistoryItem($id);
     }
 }
 

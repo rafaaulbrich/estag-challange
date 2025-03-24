@@ -291,6 +291,21 @@ async function cancelOrder() {
     await showTotal();
 }
 
+function validAmountProduct() {
+    let amountStock = products.find((p) => p.code == productSelect.value).amount;
+    let findProduct = cartItems.findIndex((p) => p.product_code == productSelect.value);
+    let amountCart = 0;
+
+    if (findProduct !== -1) {
+        amountCart = cartItems[findProduct].amount
+    }
+
+    if (Number(amountCart) + Number(amount.value) > Number(amountStock)) {
+        return false
+    }
+    return true;
+}
+
 async function finishPurchase() {
     if (cartItems.length === 0) {
         return alert("Your cart is empty!");
@@ -316,7 +331,7 @@ async function finishPurchase() {
             console.error("Erro ao decrementar quantidade do estoque:", e);
         }
     }
-)
+    )
 
     await createOrder();
     await getActiveOrder();
@@ -400,20 +415,19 @@ const createItem = async () => {
         return alert("All fields need to be filled!")
     };
 
-    // if (!validAndDecrement()) {
-    //     return alert("The quantity you want isn't available in stock!")
-    // };
-
     if (!validAmount()) {
         return alert("The number you want to put isn't valid!");
-    }
+    };
+
+    if (!validAmountProduct()) {
+        return alert("The quantity you want isn't available in stock!")
+    };
 
     if (!validAmountInteger()) {
         return alert("You can't add a quantity isn't integer");
-    }
+    };
 
     await addOrIncrement(item);
-    // await validAndDecrement(item);
     await getOrderItemsById(order.code);
     await showCartItems();
     await showTotal();
