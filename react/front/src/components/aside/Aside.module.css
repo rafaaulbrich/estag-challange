@@ -1,3 +1,32 @@
 .aside {
-    background-color: rgb(87, 87, 216);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: rgb(69, 69, 155);
+    height: 90vh;
+    width: 7%;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: 2.5%;
+    box-shadow: 5px 0 5px -5px #333;
+}
+
+.ul {
+    list-style: none;
+}
+
+h2 {
+    margin-top: 50%;
+}
+
+.li {
+    color: white;
+    text-decoration: none;
+    margin-top: 60%;
+    font-weight: bold;
+}
+
+.li:hover {
+    color: #dfdcdc;
+    transition: .2s;
 }

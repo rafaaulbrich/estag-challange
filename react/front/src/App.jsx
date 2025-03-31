@@ -1,4 +1,3 @@
-import React from 'react';
 import Aside from './components/aside/Aside';
 
 function App() {
