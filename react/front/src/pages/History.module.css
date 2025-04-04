@@ -1,0 +1,14 @@
+.table {
+    background-color: #e7e7e5bb;
+    margin-top: 10%;
+    margin-left: 50%;
+    border-radius: 10px;
+    border-collapse: collapse;
+    color: #807f7f;
+    width: 80%;
+    height: 100%;
+}
+
+.lastElement {
+    border-right: none;
+}

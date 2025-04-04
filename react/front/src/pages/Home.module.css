@@ -1,0 +1,52 @@
+.inputs {
+    margin-top: 15%;
+}
+
+.table {
+    background-color: #e7e7e5bb;
+    margin-top: 15%;
+    /* margin-left: 5%; */
+    border-radius: 10px;
+    border-collapse: collapse;
+    color: #807f7f;
+    width: 80%;
+    /* height: 100%; */
+}
+
+.lastElement {
+    border-right: none;
+}
+
+th,
+td {
+    padding: 1%;
+    border-right: solid 1px;
+    text-align: start;
+}
+
+tr {
+    text-align: left;
+    border-bottom: solid 1px;
+}
+
+tbody > *:last-child {
+    border-bottom: none !important;
+}
+
+.select {
+    padding: .5%;
+    background-color: #EFEFEF;
+    border: 1px solid #a7a4a4;
+    border-radius: 3px;
+    width: 61.5%;
+    margin-left: 15%;
+    margin-top: 2%;
+    color: #777373;
+}
+
+.result {
+    display: flex;
+    flex-direction: column;
+    margin-left: 60%;
+    margin-top: 65%;
+}

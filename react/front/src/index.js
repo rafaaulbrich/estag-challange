@@ -4,11 +4,11 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 
-import History from './components/pages/History';
-import Category from './components/pages/Category';
-import Product from './components/pages/Product';
-import Layout from './components/layouts/Layout'
-import Home from './components/pages/Home';
+import History from './pages/History';
+import Category from './pages/Category';
+import Product from './pages/Product';
+import Layout from './layouts/Layout'
+import Home from './pages/Home';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

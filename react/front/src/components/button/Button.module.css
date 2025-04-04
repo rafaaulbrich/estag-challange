@@ -1,0 +1,10 @@
+.button button {
+    padding: .5%;
+    background-color: rgb(69, 69, 155);
+    border: none;
+    border-radius: 3px;
+    width: 61.5%;
+    margin-left: 15%;
+    margin-top: 2%;
+    color: white;
+}
