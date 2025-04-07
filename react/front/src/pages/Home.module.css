@@ -50,3 +50,10 @@ tbody > *:last-child {
     margin-left: 60%;
     margin-top: 65%;
 }
+
+.buttonsResult {
+    display: grid;
+    grid-template-columns: 40% 40%;
+    margin-left: 60%;
+    margin-top: 1%;
+}

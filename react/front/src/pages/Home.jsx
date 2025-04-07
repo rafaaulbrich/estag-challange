@@ -291,6 +291,8 @@ const Home = () => {
                         <div className={`${styles.result}`}>
                             <p>Tax: ${Number(fullTax).toFixed(2)}</p>
                             <p>Total: ${(Number(cartTotal) + Number(fullTax)).toFixed(2)}</p>
+                        </div>
+                        <div className={`${styles.buttonsResult}`}>
                             <ButtonAction onClick={cancelOrder}>Cancel</ButtonAction>
                             <ButtonAction onClick={finishPurchase}>Finish</ButtonAction>
                         </div>

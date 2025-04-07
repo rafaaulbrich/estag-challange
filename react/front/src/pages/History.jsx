@@ -13,14 +13,16 @@ const History = () => {
     const { cartItems, getOrderItemsById } = useOrderItem();
 
     const [modalOpen, setModalOpen] = useState(false);
+    const [currentOrder, setCurrentOrder] = useState({});
 
     useEffect(() => {
         getProducts();
         getAllOrdersInactive();
     }, [])
 
-    const handleModalOpen = async (code) => {
-        await getOrderItemsById(code);
+    const handleModalOpen = async (order) => {
+        setCurrentOrder(order);
+        await getOrderItemsById(order.code);
         setModalOpen(true);
     }
 
@@ -47,7 +49,7 @@ const History = () => {
                                         <td className={`${styles.td}`}>${Number(item.tax).toFixed(2)}</td>
                                         <td className={`${styles.td}`}>${Number(item.total).toFixed(2)}</td>
                                         <td className={`${styles.lastElement}`}>
-                                            <ButtonAction onClick={() => handleModalOpen(item.code)}>View</ButtonAction>
+                                            <ButtonAction onClick={() => handleModalOpen(item)}>View</ButtonAction>
                                         </td>
                                     </tr>
                                 )
@@ -56,24 +58,26 @@ const History = () => {
                     </table>
                     <Modal modalOpen={modalOpen} setModalOpen={setModalOpen}>
                         <div className={`${styles.modalHeader}`}>
-                            <h1>Purchase #</h1>
+                            <h1>Purchase #{currentOrder?.code}</h1>
+                            <h5>Total: ${(Number(currentOrder?.total) + Number(currentOrder.tax)).toFixed(2)}</h5>
+                            <h5>Tax: ${Number(currentOrder?.tax)}</h5>
                         </div>
-                        <table className={`${styles.modalContainer}`}>
+                        <table className={`${styles.tableModal}`}>
                             <thead>
                                 <tr>
                                     <th>Product</th>
                                     <th>Unit price</th>
                                     <th>Amount</th>
-                                    <th>Total</th>
+                                    <th className={`${styles.lastElement}`}>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {cartItems.map((item) => (
                                     <tr key={item.code}>
-                                        <td>${products.find((p) => p.code == item.product_code).name}</td>
+                                        <td>{products.find((p) => p.code == item.product_code).name}</td>
                                         <td>${Number(item.price).toFixed(2)}</td>
-                                        <td>${item.amount} units</td>
-                                        <td className={`${styles.lastElement}`}>${Number(Number(item.price).toFixed(2) * Number(item.amount))}</td>
+                                        <td>{item.amount} units</td>
+                                        <td className={`${styles.lastElement}`}>${Number(Number(item.price) * Number(item.amount)).toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>

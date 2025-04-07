@@ -12,3 +12,18 @@
 .lastElement {
     border-right: none;
 }
+
+.tableModal {
+    color: #807f7f;
+    border-collapse: collapse;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: 2%;
+}
+
+.modalHeader {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 3%;
+    margin-bottom: 3%;
+    color: #807f7f;
+}

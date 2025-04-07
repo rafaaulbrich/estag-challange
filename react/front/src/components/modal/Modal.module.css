@@ -11,12 +11,6 @@
     justify-content: center;
 }
 
-.modalHeader {
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 3%;
-    margin-bottom: 3%;
-}
-
 .modal {
     width: 40%;
     background-color: #ffffff62;
